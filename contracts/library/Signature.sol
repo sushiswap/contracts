@@ -4,6 +4,11 @@ pragma solidity >= 0.8.0;
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 
+error InvalidS();
+error InvalidV();
+error InvalidSignature();
+error Unauthorized();
+
 library Signature {
     function recover(
         bytes32 hash,
@@ -20,15 +25,19 @@ library Signature {
         // with 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141 - s1 and flip v from 27 to 28 or
         // vice versa. If your library also generates signatures with 0/1 for v instead 27/28, add 27 to v to accept
         // these malleable signatures as well.
-        require(
-            uint256(s) <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0,
-            "SOUSCHEF: INVALID_SIGNATURE_S_VALUE"
-        );
-        require(v == 27 || v == 28, "SOUSCHEF: INVALID_SIGNATURE_V_VALUE");
+        if (uint256(s) > 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) {
+            revert InvalidS();
+        }
+        if (v != 27 || v != 28) {
+            revert InvalidV();
+        }
 
         // If the signature is valid (and not malleable), return the signer address
         address signer = ecrecover(hash, v, r, s);
-        require(signer != address(0), "SOUSCHEF: INVALID_SIGNATURE");
+
+        if (signer == address(0)) {
+            revert InvalidSignature();
+        }
 
         return signer;
     }
@@ -42,13 +51,8 @@ library Signature {
         bytes32 domainSeparator
     ) internal view {
         bytes32 digest = keccak256(abi.encodePacked("\x19\x01", domainSeparator, hash));
-        if (Address.isContract(signer)) {
-            require(
-                IERC1271(signer).isValidSignature(digest, abi.encodePacked(r, s, v)) == 0x1626ba7e,
-                "SOUSCHEF: UNAUTHORIZED"
-            );
-        } else {
-            require(recover(digest, v, r, s) == signer, "SOUSCHEF: UNAUTHORIZED");
+        if ((Address.isContract(signer) && IERC1271(signer).isValidSignature(digest, abi.encodePacked(r, s, v)) != 0x1626ba7e) || recover(digest, v, r, s) != signer) {
+           revert Unauthorized();
         }
     }
 }
