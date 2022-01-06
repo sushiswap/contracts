@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity >= 0.8.0;
+pragma solidity >=0.8.0;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import '@openzeppelin/contracts/access/Ownable.sol';
 
 interface Proxy {
   function create(string calldata) external;
@@ -10,6 +10,7 @@ interface Proxy {
 
 contract ProxySubject is Proxy {
   string public data;
+
   function create(string calldata _data) external override(Proxy) {
     data = _data;
   }
@@ -25,9 +26,8 @@ contract ProxyFactory {
   constructor(address _subject) {
     subject = _subject;
   }
-  
-  function create(string calldata data) external{
 
+  function create(string calldata data) external {
     address proxyAddress;
 
     bytes20 targetBytes = bytes20(subject);
@@ -38,7 +38,7 @@ contract ProxyFactory {
       mstore(add(clone, 0x14), targetBytes)
       mstore(add(clone, 0x28), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)
       proxyAddress := create(0, clone, 0x37)
-    }  
+    }
 
     Proxy proxy = Proxy(proxyAddress);
 
