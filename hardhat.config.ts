@@ -48,6 +48,13 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY
   },
+  // external: {
+  //   contracts: [
+  //     {
+  //       artifacts: 'node_modules/@openzeppelin/contracts/build/contracts/ERC20.json'
+  //     }
+  //   ]
+  // },
   gasReporter: {
     coinmarketcap: process.env.COINMARKETCAP_API_KEY,
     currency: 'USD',

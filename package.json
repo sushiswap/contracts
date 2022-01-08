@@ -1,5 +1,6 @@
 {
   "name": "@sushiswap/contracts",
+  "version": "1.0.0-canary.0",
   "description": "SushiSwap contracts",
   "keywords": [
     "sushiswap",
@@ -10,6 +11,13 @@
     "url": "https://github.com/sushiswap/contracts/issues",
     "email": "secu@sushi.com"
   },
+  "files": [
+    "artifacts",
+    "contracts",
+    "deploy",
+    "deployments",
+    "types"
+  ],
   "license": "MIT",
   "author": "Matthew Lilley <hello@matthewlilley.com>",
   "scripts": {
